@@ -25,6 +25,7 @@ infixl 7 |*|
 -- Заменить переменную `var` на `replacement`
 -- во всём выражении `expression`
 replaceVar :: String -> Term -> Term -> Term
+replaceVar var replacement (IntConstant intConstant) = (IntConstant intConstant)
 replaceVar var replacement Variable {varName = varName'} | varName' == var = replacement
                                                          | otherwise = Variable varName'
 replaceVar var replacement Add{lhv = l, rhv = r}  = Add  (replaceVar var replacement l) (replaceVar var replacement r)
@@ -37,6 +38,6 @@ replaceVar var replacement Mult{lhv = l, rhv = r} = Mult (replaceVar var replace
 evaluate :: Term -> Term
 evaluate IntConstant {intValue = a} = IntConstant a
 evaluate Variable {varName = a}     = Variable a
-evaluate Add  {lhv = l, rhv = r}    =  ( (|+|) (evaluate l) (evaluate r))
-evaluate Sub  {lhv = l, rhv = r}    =  ( (|-|) (evaluate l) (evaluate r))
-evaluate Mult {lhv = l, rhv = r}    =  ( (|*|) (evaluate l) (evaluate r))
+evaluate Add  {lhv = l, rhv = r}    = (|+|) (evaluate l) (evaluate r)
+evaluate Sub  {lhv = l, rhv = r}    = (|-|) (evaluate l) (evaluate r)
+evaluate Mult {lhv = l, rhv = r}    = (|*|) (evaluate l) (evaluate r)
