@@ -20,8 +20,8 @@ data Term = IntConstant{ intValue :: Int }           -- числовая кон�
 (|*|) :: Term -> Term -> Term
 (|*|) (IntConstant l) (IntConstant r) = IntConstant (l * r)
 (|*|) l r = Mult l r
-infixl 6 (|+|), (|-|)
-infixl 7 (|*|)
+infixl 6 |+|, |-|
+infixl 7 |*|
 -- Заменить переменную `var` на `replacement`
 -- во всём выражении `expression`
 replaceVar :: String -> Term -> Term -> Term
