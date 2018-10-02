@@ -35,8 +35,8 @@ replaceVar var replacement Mult{lhv = l, rhv = r} = Mult (replaceVar var replace
 -- Посчитать значение выражения `Term`
 -- если оно состоит только из констант (и упрощает его по мере возможности, если нет).
 evaluate :: Term -> Term
-evaluate IntConstant {intValue = a}                                                 = IntConstant a
-evaluate Variable {varName = a}                                                     = Variable a
-evaluate Add  {lhv = l,                          rhv = r}                           =  ( (|+|) (evaluate l) (evaluate r))
-evaluate Sub  {lhv = l,                          rhv = r}                           =  ( (|-|) (evaluate l) (evaluate r))
-evaluate Mult {lhv = l,                          rhv = r}                           =  ( (|*|) (evaluate l) (evaluate r))
+evaluate IntConstant {intValue = a} = IntConstant a
+evaluate Variable {varName = a}     = Variable a
+evaluate Add  {lhv = l, rhv = r}    =  ( (|+|) (evaluate l) (evaluate r))
+evaluate Sub  {lhv = l, rhv = r}    =  ( (|-|) (evaluate l) (evaluate r))
+evaluate Mult {lhv = l, rhv = r}    =  ( (|*|) (evaluate l) (evaluate r))
