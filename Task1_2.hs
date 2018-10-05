@@ -22,12 +22,6 @@ doesSquareBetweenExist from to = (ceiling $ sqrt $ fromIntegral from) <= (floor 
 -- является ли дата корректной с учётом количества дней в месяце и
 -- вискокосных годов?
 isDateCorrect :: Integer -> Integer -> Integer -> Bool
-{-isDateCorrect day month year | month `mod` 2 /= 0 || month == 8 && day >= 1 && day <= 31 = True
-                             | month `mod` 2 == 0 && month /= 2 && day >= 1 && day <= 30 = True
-                             | yearIsLeap year == True  && month == 2 && day >= 1 && day <= 29 = True
-                             | yearIsLeap year == False && month == 2 && day >= 1 && day <= 28 = True
-                             | otherwise = False
--}
 isDateCorrect day month year | month < 1 || month > 12 = False
                              | year  < 0 = False
                              | month == 2 = leapYearCheck day year
