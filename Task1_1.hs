@@ -33,14 +33,14 @@ replaceVar _ _ a = a
 -- Посчитать значение выражения `Term`
 -- если оно состоит только из констант (и упрощает его по мере возможности, если нет).
 evaluate :: Term -> Term
-evaluate Add  {lhv = l, rhv = r} | l == IntConstant 0 = evaluate r 
-                                 | r == IntConstant 0 = evaluate l
-                                 | otherwise = (|+|) (evaluate l) (evaluate r)
+evaluate Add { lhv = IntConstant 0, rhv = r}             = evaluate r
+evaluate Add { lhv = l,             rhv = IntConstant 0} = evaluate l
+evaluate Add { lhv = l,             rhv = r}             = (|+|) (evaluate l) (evaluate r)
 
-evaluate Sub  {lhv = l, rhv = r} | r == IntConstant 0 = evaluate l
-                                 | otherwise = (|-|) (evaluate l) (evaluate r)
+evaluate Sub { lhv = l,             rhv = IntConstant 0} = evaluate l
+evaluate Sub { lhv = l,             rhv = r}             = (|-|) (evaluate l) (evaluate r)
 
-evaluate Mult {lhv = l, rhv = r} | r == IntConstant 1 = evaluate l
-                                 | l == IntConstant 1 = evaluate r
-                                 | otherwise = (|*|) (evaluate l) (evaluate r)
+evaluate Mult { lhv = IntConstant 1, rhv = r}             = evaluate r
+evaluate Mult { lhv = l,             rhv = IntConstant 1} = evaluate l
+evaluate Mult { lhv = l,             rhv = r}             = (|*|) (evaluate l) (evaluate r)
 evaluate a = a
