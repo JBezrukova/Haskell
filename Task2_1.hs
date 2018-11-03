@@ -73,7 +73,7 @@ nearestLE i (Node (a, b) l r) | i == a = (a, b)
                                                                                    else nearestLE i l
                               | i > a && isEmpty r = (a, b) 
                               | i < a && isEmpty l = error "No nearest element founded"
-                              | otherwise = if (getLastLeftPair r) <= i then nearestLE i r else (a, b)
+                              | otherwise = if (getLastLeftKey r) <= i then nearestLE i r else (a, b)
 
 
 isLeaf :: TreeMap v -> Bool
@@ -95,10 +95,10 @@ getPare :: TreeMap v -> (Integer, v)
 getPare (Leaf (a, b)) = (a, b)
 getPare (Node (a, b) l r) = (a, b)
 
-getLastLeftPair :: TreeMap v -> Integer
-getLastLeftPair (Leaf (a, b)) = a
-getLastLeftPair (Node (a, b) EmptyTreeMap _) = a
-getLastLeftPair (Node (a, b) l _) = getLastLeftPair l
+getLastLeftKey :: TreeMap v -> Integer
+getLastLeftKey (Leaf (a, b)) = a
+getLastLeftKey (Node (a, b) EmptyTreeMap _) = a
+getLastLeftKey (Node (a, b) l _) = getLastLeftKey l
                                
 -- Построение дерева из списка пар
 treeFromList :: [(Integer, v)] -> TreeMap v
