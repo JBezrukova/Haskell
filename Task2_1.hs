@@ -54,23 +54,52 @@ replace :: TreeMap v -> TreeMap v -> TreeMap v
 replace EmptyTreeMap x = x
 replace (Leaf (a, b)) x = (Node (a, b) EmptyTreeMap x)
 replace (Node (a, b) l r) x = (Node (a, b) l (replace r x))
+
 -- Поиск ближайшего снизу ключа относительно заданного
 nearestLE :: Integer -> TreeMap v -> (Integer, v)
 nearestLE i EmptyTreeMap = error "The key does not belong to a key set"
-nearestLE i (Leaf (a, b)) | i == a = error "This is the last element (Leaf) with setted key"
-                          | otherwise = error "The key does not belong to a key set"
-nearestLE i node@(Node (a, b) l r) | i == a = findNearest node
-                                   | i >  a = nearestLE i r
-                                   | i <  a = nearestLE i l
-findNearest :: TreeMap v -> (Integer, v)
-findNearest (Node (a, b) EmptyTreeMap EmptyTreeMap) = error "The last element is founded"
-findNearest (Node (a, b) _ r) = getPare r
-findNearest (Node (a, b) l _) = getPare l
+
+nearestLE i (Leaf (a, b)) | i >= a = (a, b)
+                          | otherwise = error "No nearest element founded"
+
+nearestLE i (Node (a, b) l r) | i == a = (a, b)
+                              | i < a && isLeaf l = if ((fst $ getPare l) <= i) then getPare l else error "No nearest element founded"
+                              | i < a && isNode l = if (i > (fst $ getPare l)) then if isNode (getRight l) then nearestLE i (getRight l) 
+                                                                                        else 
+                                                                                             if isEmpty (getRight l) then (getPare l)
+                                                                                                 else 
+                                                                                                     if ((fst $ getPare (getRight l)) > i) then (getPare l)
+                                                                                                         else nearestLE i (getRight l)
+                                                                                   else nearestLE i l
+                              | i > a && isEmpty r = (a, b) 
+                              | i < a && isEmpty l = error "No nearest element founded"
+                              | otherwise = if (getLastLeftPair r) <= i then nearestLE i r else (a, b)
+
+
+isLeaf :: TreeMap v -> Bool
+isLeaf (Leaf (a, b)) = True
+isLeaf _ = False
+
+isNode :: TreeMap v -> Bool
+isNode (Node (a, b) l r) = True
+isNode _ = False
+
+isEmpty :: TreeMap v -> Bool
+isEmpty EmptyTreeMap = True
+isEmpty _ = False
+
+getRight :: TreeMap v -> TreeMap v
+getRight (Node (a, b) l r) = r
 
 getPare :: TreeMap v -> (Integer, v)
 getPare (Leaf (a, b)) = (a, b)
 getPare (Node (a, b) l r) = (a, b)
 
+getLastLeftPair :: TreeMap v -> Integer
+getLastLeftPair (Leaf (a, b)) = a
+getLastLeftPair (Node (a, b) EmptyTreeMap _) = a
+getLastLeftPair (Node (a, b) l _) = getLastLeftPair l
+                               
 -- Построение дерева из списка пар
 treeFromList :: [(Integer, v)] -> TreeMap v
 treeFromList [] = EmptyTreeMap
