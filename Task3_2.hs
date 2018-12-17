@@ -3,10 +3,14 @@
 import Todo(todo)
 
 data ReverseList a = RNil | RCons (ReverseList a) a
+-- No instance for (Foldable ReverseList) 
+-- Implementing Foldable for a data structure requires writing just one function: either foldMap or foldr
+instance Foldable ReverseList where
+  foldr function a RNil = a
+  foldr function a (RCons b c) = function c (foldr function a b)
 
 rlistToList :: ReverseList a -> [a]
-rlistToList RNil = []
-rlistToList (RCons a b) = b : rlistToList a
+rlistToList = foldl(\ a b -> b : a) [] 
 
 listToRList :: [a] -> ReverseList a
 listToRList [] = RNil
