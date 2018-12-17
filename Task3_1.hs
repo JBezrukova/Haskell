@@ -4,31 +4,36 @@ instance Eq WeirdPeanoNumber where
     (==) Zero Zero = True
     (==) (Succ a) (Succ b) = a == b    
     (==) (Pred a) (Pred b) = a == b
-    (==) this other = False
+    (==) _ _ = False
+
+
+reduce :: WeirdPeanoNumber -> WeirdPeanoNumber
+reduce Zero = Zero
+reduce (Succ (Pred a)) = reduce a
+reduce (Pred (Succ a)) = reduce a
+reduce (Succ a) = case reduce a of (Pred b) -> b
+                                   _ -> Succ (reduce a)
+reduce (Pred a) = case reduce a of (Succ b) -> b
+                                   _ -> Pred (reduce a)
+
+quotRem' a Zero = error "Can not be devided by zero"
+quotRem' a b | (a == b) = (Succ (Zero), Zero)
+             | abs a < abs b = (Zero, a)
+             | a > 0 && b > 0 = quotrem' a b
+             | otherwise = quotrem' (abs a) (abs b)
+   
+            where quotrem' a b | (a == b) = (Succ(Zero), Zero)
+                               | (a < b)  = (Zero, a)
+                               | (a > b)  = (Succ(fst (quotrem' (a-b) b)),snd (quotrem' (a-b) b))
+
 
 instance Ord WeirdPeanoNumber where
-    (<=) Zero Zero = True
-    (<=) Zero (Succ a) = if (a < (-1)) then False else True
-    (<=) Zero (Pred a) = if (a < 1) then False else True
- 
-    (<=) (Pred a) (Pred b) = a <= b
-    (<=) (Succ a) (Succ b) = a <= b
- 
-    (<=) (Pred a) b = toInteger (a - 1) <= toInteger b
-    (<=) (Succ a) b = toInteger (a + 1) <= toInteger b
- 
-    (<) Zero Zero = False
-    (<) Zero (Succ a) = if (a < 0) then False else True
-    (<) Zero (Pred a) = if (a > 1) then True else False
- 
-    (<) (Pred a) (Pred b) =  a < b 
-    (<) (Succ a) (Succ b) =  a < b 
- 
-    (<) (Pred a) b = toInteger (a - 1) < toInteger b
-    (<) (Succ a) b = toInteger (a + 1) < toInteger b
-
-    (>) a b = not ((<) a b)
-    (>=) a b = not ((<=) a b)
+     (<=) a b = lessOrEqual (reduce a) (reduce b) where
+      lessOrEqual (Succ a) (Succ b) = lessOrEqual a b
+      lessOrEqual (Pred a) (Pred b) = lessOrEqual a b
+      lessOrEqual (Pred _) Zero = True
+      lessOrEqual Zero (Succ _) = True
+      lessOrEqual a b = a == b
 
 instance Num WeirdPeanoNumber where
     
@@ -36,20 +41,14 @@ instance Num WeirdPeanoNumber where
     negate (Pred a) = Succ (negate a)
     negate (Succ a) = Pred (negate a)
     
-    abs Zero = Zero
-    abs arg @(Pred a) | arg < Zero = Succ (abs a)
-                      | otherwise = arg
-    abs arg @(Succ a) | arg < Zero = Pred (abs a)
-                      | otherwise = arg
+    abs a | signum a == 0 = Zero
+          | signum a == 1 = a
+          | signum a == (-1) = negate a
    
 
-    signum Zero = Zero
-    signum arg @(Succ a) | arg > Zero = Succ Zero
-                         | arg < Zero = Pred Zero
-                         | otherwise = Zero
-    signum arg @(Pred a) | arg > Zero =  Succ Zero
-                         | arg < Zero = Pred Zero
-                         | otherwise = Zero
+    signum a | a == Zero = 0
+             | a < Zero = (-1)
+             | otherwise = 1
 
     fromInteger val | (val == 0) = Zero
                     | (val > 0) = Succ $ fromInteger (val - 1)
@@ -84,23 +83,13 @@ instance Show WeirdPeanoNumber where
     show a = show (toInteger a)
 
 instance Real WeirdPeanoNumber where
-    toRational Zero = toRational 0
-    toRational (Succ a) = toRational (toRational a + 1)
-    toRational (Pred a) = toRational (toRational a - 1)
+    toRational a = toRational (toInteger a)
 
 instance Integral WeirdPeanoNumber where
     toInteger Zero = toInteger 0
-    toInteger (Succ a) = toInteger (toInteger a + 1)
-    toInteger (Pred a) = toInteger (toInteger a - 1)
+    toInteger (Succ a) = toInteger a + 1
+    toInteger (Pred a) = toInteger a - 1
 
-    quotRem a Zero = error "Can not be devided by zero"
-    quotRem a b | (a == b) = (Succ (Zero), Zero)
-                | abs a < abs b = (Zero, a)
-                | a > 0 && b > 0 = quotrem' a b
-                | otherwise = quotrem' (abs a) (abs b)
-   
-                where quotrem' a b | (a == b) = (Succ(Zero), Zero)
-                                   | (a < b)  = (Zero, a)
-                                   | (a > b)  = (Succ(fst (quotrem' (a-b) b)),snd (quotrem' (a-b) b))
+    quotRem a b = quotRem' (reduce a) (reduce b)
 
     
