@@ -18,10 +18,10 @@ returnSecondElement (FourOf _ a _ _) = a
 returnThirdElement (FourOf _ _ a _)  = a
 returnFourthElement (FourOf _ _ _ a) = a
 
-
 instance Monad (FourOf) where
-	return a = FourOf a a a a
-	(FourOf a b c d) >>= f = FourOf (returnFirstElement (f a)) (returnSecondElement (f b)) (returnThirdElement (f c)) (returnFourthElement (f d))
+    return a = FourOf a a a a
+    (FourOf a b c d) >>= f = FourOf (returnFirstElement (f a)) (returnSecondElement (f b))
+                                    (returnThirdElement (f c)) (returnFourthElement (f d))
 
 x = do { x <- FourOf 1 2 3 4; y <- FourOf 4 6 7 8; return $ x + y }
 test = x ==  FourOf 5 8 10 12
